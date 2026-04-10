@@ -1059,7 +1059,25 @@
     return value.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
   }
 
+  function getStableAttrSelector(el) {
+    if (!el || !el.getAttribute) return '';
+    const stableAttrs = ['data-ed-img', 'data-ed-row', 'data-ed-panel', 'data-ed-key'];
+    for (const attr of stableAttrs) {
+      const raw = el.getAttribute(attr);
+      if (!raw) continue;
+      const val = raw.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      const sel = '[' + attr + '="' + val + '"]';
+      if (isUniqueSelector(sel, el)) return sel;
+      const tagSel = el.tagName.toLowerCase() + sel;
+      if (isUniqueSelector(tagSel, el)) return tagSel;
+    }
+    return '';
+  }
+
   function getSelector(el) {
+    const attrSel = getStableAttrSelector(el);
+    if (attrSel) return attrSel;
+
     if (el.id) {
       const idSel = '#' + escapeCssIdent(el.id);
       if (isUniqueSelector(idSel, el)) return idSel;
@@ -1080,6 +1098,82 @@
     const candidateWithClass = parentSel + ' > ' + tag + cls + ':nth-child(' + idx + ')';
     if (cls && isUniqueSelector(candidateWithClass, el)) return candidateWithClass;
     return parentSel + ' > ' + tag + ':nth-child(' + idx + ')';
+  }
+
+  function isPxValue(v) {
+    return typeof v === 'string' && /^-?\d+(\.\d+)?px$/.test(v.trim());
+  }
+
+  function pxToPercent(v, base) {
+    if (!isPxValue(v) || !base || base <= 0) return v;
+    const px = parseFloat(v);
+    const pct = (px / base) * 100;
+    return (Math.round(pct * 1000) / 1000) + '%';
+  }
+
+  function normalizeExportProps(el, props) {
+    const out = { ...props };
+    const computedPos = (out.position || getComputedStyle(el).position || '').trim();
+    const classList = el.classList || { contains: () => false };
+
+    if (
+      computedPos === 'relative' &&
+      (out.left === '0px' || out.left === '0') &&
+      (out.top === '0px' || out.top === '0')
+    ) {
+      delete out.left;
+      delete out.top;
+      if (out.position === 'relative') delete out.position;
+    }
+
+    if (el.classList && el.classList.contains('hero__tagline')) {
+      if (isPxValue(out.width)) {
+        out.width = 'min(' + out.width + ', calc(100% - 2rem))';
+      }
+      if (isPxValue(out['max-width'])) {
+        out['max-width'] = 'min(' + out['max-width'] + ', calc(100% - 2rem))';
+      }
+      if (out.position === 'absolute') {
+        out.left = '50%';
+        out.transform = 'translateX(-50%)';
+      }
+      if (typeof out.top === 'string' && out.top.endsWith('%')) {
+        out.top = 'clamp(8.5rem, 22vh, 12rem)';
+      }
+    }
+
+    if (el.hasAttribute && el.hasAttribute('data-ed-row') && isPxValue(out.height)) {
+      const cap = classList.contains('event__row') ? '62vh' : '74vh';
+      out.height = 'min(' + out.height + ', ' + cap + ')';
+      out['min-height'] = '0';
+    }
+
+    if (el.hasAttribute && el.hasAttribute('data-ed-panel')) {
+      if (classList.contains('bios__photo') || classList.contains('event__photo')) {
+        if (out.height) out.height = '100%';
+        out.overflow = 'hidden';
+      }
+      if (classList.contains('bios__text') || classList.contains('event__details')) {
+        if (out.height) out.height = '100%';
+      }
+    }
+
+    if (el.hasAttribute && el.hasAttribute('data-ed-img') && isPxValue(out.height)) {
+      out.height = 'max(100%, ' + out.height + ')';
+    }
+
+    if (computedPos === 'absolute' && el.closest('.hero')) {
+      const container = getDragContainer(el);
+      if (container) {
+        const r = container.getBoundingClientRect();
+        out.left = pxToPercent(out.left, r.width);
+        out.top = pxToPercent(out.top, r.height);
+      }
+    }
+
+    return Object.fromEntries(
+      Object.entries(out).filter(([, v]) => typeof v === 'string' && v.trim() !== '')
+    );
   }
 
   function copyToClipboard(text) {
@@ -1120,9 +1214,11 @@
     let css = '/* === Kalyanam Visual Editor Export ===\n   Paste into css/style.css to apply. === */\n\n';
 
     changes.forEach((props, el) => {
+      const normalized = normalizeExportProps(el, props);
+      if (Object.keys(normalized).length === 0) return;
       const sel = getSelector(el);
       css += sel + ' {\n';
-      Object.entries(props).forEach(([p, v]) => {
+      Object.entries(normalized).forEach(([p, v]) => {
         css += '  ' + p + ': ' + v + ';\n';
       });
       css += '}\n\n';
@@ -1158,6 +1254,13 @@
     throw new Error('Unable to load base css file');
   }
 
+  function stripPreviousEditorExports(cssText) {
+    const marker = '/* === Kalyanam Visual Editor Export ===';
+    const markerIdx = cssText.indexOf(marker);
+    if (markerIdx === -1) return cssText;
+    return cssText.slice(0, markerIdx).trimEnd();
+  }
+
   // ---- Copy All CSS ----
   copyBtn.addEventListener('click', () => {
     const css = buildChangesCss(true);
@@ -1175,7 +1278,7 @@
     const deltaCss = buildChangesCss(false);
     const hasChanges = changes.size > 0;
     try {
-      const baseCss = await getBaseCssText();
+      const baseCss = stripPreviousEditorExports(await getBaseCssText());
       const fullCss = hasChanges
         ? baseCss.trimEnd() + '\n\n' + deltaCss
         : baseCss;

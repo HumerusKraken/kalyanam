@@ -169,7 +169,6 @@ a {
   margin: 0 auto;
 }
 
-
 /* Per-letter auto-contrast spans */
 .hero__tagline .ac-letter {
   transition: color 0.3s ease;
@@ -909,158 +908,124 @@ body.ed-active .ed-img-handle {
   opacity: 0.95;
 }
 
-/* === Kalyanam Custom Overrides (stabilized) ===
-   Preserves visual editor adjustments with responsive-safe values. */
-
-:root {
-  --ed-hero-motif-left: 33.128%;
-  --ed-hero-motif-top: -0.8rem;
-  --ed-hero-title-x: 5px;
-  --ed-hero-title-y: 56px;
-  --ed-hero-tagline-top: clamp(6.3rem, 21vh, 11rem);   /* higher */
-  --ed-hero-tagline-w: clamp(19rem, 86vw, 30rem);      /* wider */
-  --ed-hero-amp-x: 37px;
-  --ed-hero-amp-y: -17px;
-  --ed-hero-bride-x: 3px;
-  --ed-hero-bride-y: -39px;
-  --ed-hero-groom-x: -6px;
-  --ed-hero-groom-y: -7px;
-  --ed-row-groom-h: clamp(440px, 70vh, 533px);
-  --ed-row-bride-h: clamp(470px, 74vh, 589px);
-  --ed-event-photo-h: clamp(300px, 52vh, 400px);
-}
+/* === Kalyanam Visual Editor Export ===
+   Paste into css/style.css to apply. === */
 
 .hero__motif {
   position: absolute;
-  left: var(--ed-hero-motif-left);
-  top: var(--ed-hero-motif-top);
-  z-index: 2;
+  left: 33.128%;
+  top: -13.86%;
 }
 
 .hero__title {
   position: relative;
-  left: var(--ed-hero-title-x);
-  top: var(--ed-hero-title-y);
+  left: 5px;
+  top: 56px;
 }
 
 .hero__tagline {
   position: absolute;
-  left: 50%;
-  top: var(--ed-hero-tagline-top);
-  transform: translateX(-50%);
-  max-width: min(var(--ed-hero-tagline-w), calc(100% - 2rem));
-  width: min(var(--ed-hero-tagline-w), calc(100% - 2rem));
-}
-
-.hero__tagline.animate-on-scroll {
-  transform: translateX(-50%) translateY(30px);
-}
-
-.hero__tagline.animate-on-scroll.is-visible {
-  transform: translateX(-50%) translateY(0);
+  left: 3.367%;
+  top: 115.939%;
+  max-width: min(401px, calc(100% - 2rem));
+  width: min(401px, calc(100% - 2rem));
 }
 
 .hero__ampersand {
   position: relative;
-  left: var(--ed-hero-amp-x);
-  top: var(--ed-hero-amp-y);
+  left: 37px;
+  top: -17px;
   font-family: 'Great Vibes', cursive;
-  font-size: clamp(2.2rem, 7.8vw, 40px);
+  font-size: 40px;
 }
 
 .hero__name.hero__name--bride {
   position: relative;
-  left: var(--ed-hero-bride-x);
-  top: var(--ed-hero-bride-y);
-  font-size: clamp(3.4rem, 13vw, 65px);
+  left: 3px;
+  top: -39px;
+  font-size: 65px;
 }
 
 .hero__name.hero__name--groom {
   position: relative;
-  left: var(--ed-hero-groom-x);
-  top: var(--ed-hero-groom-y);
-  font-size: clamp(3.4rem, 13vw, 65px);
+  left: -6px;
+  top: -7px;
+  font-size: 65px;
 }
 
-[data-ed-panel="bride-text"] .bios__desc,
-[data-ed-panel="groom-text"] .bios__desc {
+[data-ed-panel="bride-text"] > p.bios__desc:nth-child(2) {
   font-size: 14px;
 }
 
-[data-ed-panel="groom-text"] .bios__name {
+[data-ed-panel="groom-text"] > p.bios__desc:nth-child(2) {
+  font-size: 14px;
+}
+
+[data-ed-panel="groom-text"] > h2.bios__name:nth-child(1) {
   font-size: 19px;
 }
 
 [data-ed-row="groom"] {
   min-height: 0;
-  height: var(--ed-row-groom-h);
+  height: 533px;
+}
+
+[data-ed-panel="groom-text"] {
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+}
+
+[data-ed-img="murali"] {
+  height: 662px;
+  min-height: 0;
+  transform: translateY(-110px) scale(1);
+  object-position: 50% 50%;
+}
+
+[data-ed-panel="groom-photo"] {
+  height: 533px;
+  overflow: hidden;
 }
 
 [data-ed-row="bride"] {
   min-height: 0;
-  height: var(--ed-row-bride-h);
+  height: 589px;
 }
 
-[data-ed-panel="groom-text"],
 [data-ed-panel="bride-text"] {
   min-height: 0;
   height: 100%;
   overflow: auto;
 }
 
-[data-ed-panel="groom-photo"],
-[data-ed-panel="bride-photo"] {
-  height: 100%;
-  overflow: hidden;
-}
-
-[data-ed-img="murali"] {
-  height: max(100%, 662px);
-  min-height: 0;
-  transform: translateY(-110px) scale(1);
-  object-position: 50% 50%;
-}
-
 [data-ed-img="krishnendu"] {
-  height: max(100%, 662px);
+  height: 662px;
   min-height: 0;
   transform: translateY(-54px) scale(1);
   object-position: 15.8334% 50%;
 }
 
+[data-ed-panel="bride-photo"] {
+  height: 589px;
+  overflow: hidden;
+}
+
 [data-ed-img="henna"] {
-  height: max(100%, 400px);
+  height: 400px;
   min-height: 0;
   transform: translateY(-17px) scale(1.1);
   object-position: 0% 50%;
 }
 
 [data-ed-panel="event-photo"] {
-  height: var(--ed-event-photo-h);
+  height: 400px;
   overflow: hidden;
 }
 
 .event__heading {
   font-family: 'EB Garamond', Georgia, serif;
   font-style: italic;
-  font-size: clamp(1.85rem, 5.3vw, 30px);
+  font-size: 30px;
 }
 
-@media (max-width: 480px) {
-  :root {
-    --ed-hero-motif-left: 50%;
-    --ed-hero-title-x: 0px;
-    --ed-hero-title-y: 42px;
-    --ed-hero-tagline-top: clamp(8.4rem, 21vh, 11rem);  /* higher, responsive */
-    --ed-hero-tagline-w: clamp(19rem, 86vw, 30rem);     /* wider, responsive */
-    --ed-hero-amp-x: 22px;
-    --ed-hero-bride-x: 0px;
-    --ed-hero-groom-x: -2px;
-    --ed-row-groom-h: clamp(410px, 66vh, 520px);
-    --ed-row-bride-h: clamp(430px, 68vh, 560px);
-  }
-
-  .hero__motif {
-    transform: translateX(-50%);
-  }
-}
