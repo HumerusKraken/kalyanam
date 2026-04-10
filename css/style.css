@@ -1217,3 +1217,18 @@ body.ed-active .ed-img-handle {
   top: 0px;
 }
 
+/* === Kalyanam Visual Editor Export ===
+   Paste into css/style.css to apply. === */
+
+.hero__tagline {
+  position: absolute;
+  left: -168.5px;
+  top: 154px;
+}
+
+.hero__title {
+  position: absolute;
+  left: 38.1328px;
+  top: 88px;
+}
+
