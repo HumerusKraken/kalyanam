@@ -913,7 +913,7 @@ body.ed-active .ed-img-handle {
    Preserves visual editor adjustments with responsive-safe values. */
 
 :root {
-  --ed-hero-motif-left: 32.425%;
+  --ed-hero-motif-left: 50%;
   --ed-hero-motif-top: -8.868%;
   --ed-hero-title-x: 0px;
   --ed-hero-title-y: -1px;
@@ -942,6 +942,7 @@ body.ed-active .ed-img-handle {
   position: relative;
   left: var(--ed-hero-title-x);
   top: var(--ed-hero-title-y);
+  z-index: 3
 }
 
 .hero__tagline {
@@ -1099,14 +1100,17 @@ body.ed-active .ed-img-handle {
 
 .hero__motif {
   position: absolute;
-  left: 36.077%;
+  left: 50%;
   top: -24.669%;
+  transform: translateX(-50%);
 }
 
 .hero__title {
   position: relative;
-  left: 16px;
+  /* left: 16px; */
+  left: 50%;
   top: 45px;
+  transform: translateX(-50%)
 }
 
 .hero__tagline {
@@ -1119,9 +1123,9 @@ body.ed-active .ed-img-handle {
 }
 
 [data-ed-img="krishnendu"] {
-  height: max(100%, 551px);
+  height: max(100%, 418px);
   min-height: 0;
-  transform: translateY(-9px) scale(1);
+  transform: translateY(0px) scale(1);
   object-position: 37.9168% 0%;
 }
 
@@ -1144,7 +1148,7 @@ body.ed-active .ed-img-handle {
 [data-ed-img="murali"] {
   height: max(100%, 418px);
   min-height: 0;
-  transform: translateY(-51px) scale(1.244);
+  transform: translateY(-51px) scale(1.280);
   object-position: 49.1667% 0%;
 }
 
@@ -1169,4 +1173,20 @@ body.ed-active .ed-img-handle {
   position: relative;
   left: -9.83804px;
   top: -16.5172px;
+}
+
+.hero__motif.animate-on-scroll {
+  transform: translateX(-50%) translateY(30px) scale(0.5);
+}
+
+.hero__motif.animate-on-scroll.is-visible {
+  transform: translateX(-50%) translateY(0) scale(0.60);
+}
+
+.hero__title.animate-on-scroll {
+  transform: translateX(-50%) translateY(30px) scale(1); /* initial scroll state */
+}
+
+.hero__title.animate-on-scroll.is-visible {
+  transform: translateX(-50%) translateY(0px) scale(1);    /* final state */
 }
