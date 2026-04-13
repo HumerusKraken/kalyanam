@@ -154,48 +154,6 @@
     </div>
   </section>
 
-  <!-- ===== VISUAL EDITOR ===== -->
-  <button class="editor-toggle" id="editor-toggle" aria-label="Toggle visual editor">
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-    </svg>
-  </button>
-
-  <!-- Floating toolbar appears near selected element -->
-  <div class="ed-toolbar" id="ed-toolbar" hidden>
-    <div class="ed-toolbar__row">
-      <select class="ed-toolbar__font" id="ed-font" title="Font family"></select>
-      <input type="number" class="ed-toolbar__size" id="ed-size" min="8" max="120" title="Font size (px)">
-      <input type="color" class="ed-toolbar__color" id="ed-color" title="Text color">
-      <button class="ed-toolbar__btn" id="ed-bold" title="Bold"><b>B</b></button>
-      <button class="ed-toolbar__btn" id="ed-italic" title="Italic"><i>I</i></button>
-    </div>
-    <div class="ed-toolbar__row ed-toolbar__row--secondary">
-      <label class="ed-toolbar__check"><input type="checkbox" id="ed-autocolor"> Auto-contrast</label>
-      <label class="ed-toolbar__check"><input type="checkbox" id="ed-draggable"> Drag</label>
-      <button class="ed-toolbar__btn" id="ed-undo" title="Undo (Cmd/Ctrl+Z)">Undo</button>
-      <button class="ed-toolbar__btn" id="ed-redo" title="Redo (Cmd/Ctrl+Shift+Z)">Redo</button>
-      <button class="ed-toolbar__btn ed-toolbar__btn--copy" id="ed-copy-all">Copy All CSS</button>
-      <button class="ed-toolbar__btn" id="ed-copy-full" title="Copy entire css/style.css with editor changes appended">Copy Full CSS</button>
-    </div>
-    <div class="ed-toolbar__row ed-toolbar__row--align">
-      <button class="ed-toolbar__btn ed-toolbar__btn--align" id="ed-align-center" title="Center in page">Center</button>
-      <button class="ed-toolbar__btn ed-toolbar__btn--align" id="ed-align-left-half" title="Center in left half">Left 1/2</button>
-      <button class="ed-toolbar__btn ed-toolbar__btn--align" id="ed-align-right-half" title="Center in right half">Right 1/2</button>
-      <button class="ed-toolbar__btn ed-toolbar__btn--align" id="ed-align-middle" title="Vertical center">V Center</button>
-    </div>
-    <div class="ed-toolbar__row ed-toolbar__row--textalign">
-      <button class="ed-toolbar__btn ed-toolbar__btn--textalign" id="ed-text-left" title="Text align left">Text Left</button>
-      <button class="ed-toolbar__btn ed-toolbar__btn--textalign" id="ed-text-center" title="Text align center">Text Center</button>
-      <button class="ed-toolbar__btn ed-toolbar__btn--textalign" id="ed-text-right" title="Text align right">Text Right</button>
-    </div>
-  </div>
-
-  <!-- Canvas for background sampling (hidden) -->
-  <canvas id="ed-canvas" style="display:none"></canvas>
-
-  <script src="js/editor.js"></script>
-
   <!-- Music Player -->
   <audio id="bg-music" loop preload="auto">
     <source src="assets/wedding-music.mp3" type="audio/mpeg">
