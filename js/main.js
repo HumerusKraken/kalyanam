@@ -58,47 +58,23 @@ function initCountdown() {
   setInterval(update, 1000);
 }
 
-// --- Add to Calendar (.ics file download) ---
+// --- Add to Calendar (Google Calendar link) ---
 function initCalendar() {
   const btn = document.getElementById('add-to-calendar');
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    const icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Kalyanam//Wedding//EN',
-      'BEGIN:VEVENT',
-      'DTSTART:20260518T053000Z',
-      'DTEND:20260518T060000Z',
-      'SUMMARY:Kalyanam — Krishnendu & Murali Krishna Wedding',
-      'DESCRIPTION:Wedding ceremony of Krishnendu & Murali Krishna',
-      'LOCATION:Thiruvonam Auditorium\\, Thrikkakara\\, Kochi',
-      'BEGIN:VALARM',
-      'TRIGGER:-P1D',
-      'ACTION:DISPLAY',
-      'DESCRIPTION:Wedding tomorrow!',
-      'END:VALARM',
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\r\n');
-
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'kalyanam-wedding.ics';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    window.open('https://calendar.app.google/xQf9W2kCfK2Cx94CA', '_blank', 'noopener');
   });
 }
 
 // --- Parallax on Hero (subtle) ---
 function initParallax() {
   const hero = document.querySelector('.hero__photo');
-  if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  const smallViewport = window.matchMedia('(max-width: 768px)').matches;
+  if (!hero || reduceMotion || coarsePointer || smallViewport) return;
 
   let ticking = false;
 
@@ -145,6 +121,10 @@ function initAutoContrast() {
   const heroImg = document.querySelector('.hero__photo img');
   const heroPhoto = document.querySelector('.hero__photo');
   if (!tagline || !heroImg || !heroPhoto) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  const smallViewport = window.matchMedia('(max-width: 768px)').matches;
+  const lightweightMode = coarsePointer || smallViewport || reduceMotion;
 
   // Wrap each character in a span
   const text = tagline.textContent;
@@ -254,20 +234,28 @@ function initAutoContrast() {
 
   // Run on scroll and resize.
   let rafId = null;
+  let heroInView = true;
   function scheduleUpdate() {
     if (rafId) return;
     rafId = requestAnimationFrame(() => {
+      if (!heroInView) {
+        rafId = null;
+        return;
+      }
       updateLetters();
       rafId = null;
     });
   }
 
-  window.addEventListener('scroll', scheduleUpdate, { passive: true });
+  if (!lightweightMode) {
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+  }
   window.addEventListener('resize', scheduleUpdate, { passive: true });
   // Also refresh when the hero re-enters the viewport.
   const heroObserver = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      updateLetters();
+    heroInView = entries[0].isIntersecting;
+    if (heroInView) {
+      scheduleUpdate();
     }
   }, { threshold: 0 });
   heroObserver.observe(document.querySelector('.hero'));

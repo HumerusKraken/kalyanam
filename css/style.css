@@ -85,7 +85,7 @@ a {
 .hero {
   position: relative;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,7 +105,7 @@ a {
   height: 100%;
   object-fit: cover;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
 }
 
 .hero__overlay {
@@ -461,7 +461,7 @@ a {
   height: auto;
   object-fit: cover;
   min-height: 80vh;
-  min-height: 80dvh;
+  min-height: 80svh;
 }
 
 /* ========================================
@@ -556,8 +556,8 @@ a {
   --ed-hero-bride-y: -39px;
   --ed-hero-groom-x: -6px;
   --ed-hero-groom-y: -7px;
-  --ed-row-groom-h: min(418px, 74vh);
-  --ed-row-bride-h: min(551px, 74vh);
+  --ed-row-groom-h: min(418px, 74svh);
+  --ed-row-bride-h: min(551px, 74svh);
   --ed-event-photo-h: 100%;
   --ed-closing-photo-h: 778px;
 }
@@ -712,13 +712,13 @@ a {
     --ed-hero-motif-left: 50%;
     --ed-hero-title-x: 0px;
     --ed-hero-title-y: 42px;
-    --ed-hero-tagline-top: clamp(8.4rem, 21vh, 11rem);  /* higher, responsive */
+    --ed-hero-tagline-top: clamp(8.4rem, 21svh, 11rem);  /* higher, responsive */
     --ed-hero-tagline-w: clamp(19rem, 86vw, 30rem);     /* wider, responsive */
     --ed-hero-amp-x: 22px;
     --ed-hero-bride-x: 0px;
     --ed-hero-groom-x: -2px;
-    --ed-row-groom-h: clamp(410px, 66vh, 520px);
-    --ed-row-bride-h: clamp(430px, 68vh, 560px);
+    --ed-row-groom-h: clamp(410px, 66svh, 520px);
+    --ed-row-bride-h: clamp(430px, 68svh, 560px);
   }
 
   .hero__motif {
@@ -767,7 +767,7 @@ a {
 
 [data-ed-row="bride"] {
   min-height: 0;
-  height: min(530px, 74vh);
+  height: min(530px, 74svh);
 }
 
 [data-ed-panel="bride-text"] {
