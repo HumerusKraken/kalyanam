@@ -96,22 +96,210 @@ function initParallax() {
 // --- Music Toggle ---
 function initMusic() {
   const btn = document.getElementById('music-toggle');
-  const audio = document.getElementById('bg-music');
-  if (!btn || !audio) return;
+  const fallbackAudio = document.getElementById('bg-music-fallback');
+  const iframe = document.getElementById('sc-player');
+  const sourceLink = document.getElementById('music-source-link');
+  if (!btn) return;
 
-  btn.classList.add('is-paused');
+  const scTrackUrl = (btn.dataset.scTrackUrl || '').trim();
+  const fallbackSrc = (btn.dataset.fallbackSrc || '').trim();
+  const sourceUrl = (btn.dataset.sourceUrl || scTrackUrl).trim();
+  const SOUND_CLOUD_CONFIRM_MS = 1800;
 
-  btn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play().then(() => {
-        btn.classList.remove('is-paused');
-        btn.classList.add('is-playing');
-      }).catch(() => {});
-    } else {
-      audio.pause();
-      btn.classList.add('is-paused');
-      btn.classList.remove('is-playing');
+  let widget = null;
+  let widgetReady = false;
+  let activeBackend = 'none';
+  let isPlaying = false;
+  let awaitingSoundCloudPlay = false;
+  let playConfirmTimeout = null;
+
+  function setButtonState(playing) {
+    isPlaying = playing;
+    btn.classList.toggle('is-playing', playing);
+    btn.classList.toggle('is-paused', !playing);
+    btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+  }
+
+  function clearPlayTimeout() {
+    if (!playConfirmTimeout) return;
+    window.clearTimeout(playConfirmTimeout);
+    playConfirmTimeout = null;
+  }
+
+  function pauseSoundCloudSilently() {
+    if (!widget) return;
+    try {
+      widget.pause();
+    } catch (_) {}
+  }
+
+  function stopActivePlayback() {
+    clearPlayTimeout();
+    awaitingSoundCloudPlay = false;
+    if (activeBackend === 'soundcloud') {
+      pauseSoundCloudSilently();
+    } else if (activeBackend === 'fallback' && fallbackAudio) {
+      fallbackAudio.pause();
     }
+    activeBackend = 'none';
+    setButtonState(false);
+  }
+
+  async function playFallback() {
+    if (!fallbackAudio) {
+      console.warn('[music] Fallback audio element not found.');
+      activeBackend = 'none';
+      setButtonState(false);
+      return false;
+    }
+
+    if (fallbackSrc && fallbackAudio.getAttribute('src') !== fallbackSrc) {
+      fallbackAudio.setAttribute('src', fallbackSrc);
+      fallbackAudio.load();
+    }
+
+    try {
+      activeBackend = 'fallback';
+      await fallbackAudio.play();
+      setButtonState(true);
+      return true;
+    } catch (error) {
+      console.warn('[music] Fallback audio failed to play.', error);
+      activeBackend = 'none';
+      setButtonState(false);
+      return false;
+    }
+  }
+
+  function playSoundCloud() {
+    if (!widget || !widgetReady) return false;
+
+    clearPlayTimeout();
+    awaitingSoundCloudPlay = true;
+    activeBackend = 'soundcloud';
+
+    try {
+      widget.play();
+    } catch (error) {
+      console.warn('[music] SoundCloud play request failed.', error);
+      awaitingSoundCloudPlay = false;
+      activeBackend = 'none';
+      return false;
+    }
+
+    playConfirmTimeout = window.setTimeout(() => {
+      if (!awaitingSoundCloudPlay) return;
+      awaitingSoundCloudPlay = false;
+      pauseSoundCloudSilently();
+      void playFallback();
+    }, SOUND_CLOUD_CONFIRM_MS);
+
+    return true;
+  }
+
+  function configureAttribution() {
+    if (!sourceLink) return;
+    if (!sourceUrl) {
+      sourceLink.removeAttribute('href');
+      sourceLink.textContent = 'SoundCloud track (set data-sc-track-url)';
+      return;
+    }
+    sourceLink.href = sourceUrl;
+  }
+
+  function initSoundCloudWidget() {
+    if (!iframe) {
+      console.warn('[music] SoundCloud iframe not found.');
+      return;
+    }
+    if (!scTrackUrl) {
+      console.warn('[music] Missing data-sc-track-url on #music-toggle.');
+      return;
+    }
+
+    const params = new URLSearchParams({
+      url: scTrackUrl,
+      auto_play: 'false',
+      visual: 'false',
+      hide_related: 'true',
+      show_comments: 'false',
+      show_user: 'true',
+      show_reposts: 'false',
+      show_teaser: 'false',
+      buying: 'false',
+      sharing: 'false',
+      download: 'false'
+    });
+
+    iframe.src = `https://w.soundcloud.com/player/?${params.toString()}`;
+
+    if (!(window.SC && typeof window.SC.Widget === 'function')) {
+      console.warn('[music] SoundCloud Widget API unavailable. Fallback will be used.');
+      return;
+    }
+
+    widget = window.SC.Widget(iframe);
+    widget.bind(window.SC.Widget.Events.READY, () => {
+      widgetReady = true;
+    });
+    widget.bind(window.SC.Widget.Events.PLAY, () => {
+      clearPlayTimeout();
+      awaitingSoundCloudPlay = false;
+      activeBackend = 'soundcloud';
+      setButtonState(true);
+      if (fallbackAudio && !fallbackAudio.paused) {
+        fallbackAudio.pause();
+      }
+    });
+    widget.bind(window.SC.Widget.Events.PAUSE, () => {
+      if (activeBackend !== 'soundcloud' || awaitingSoundCloudPlay) return;
+      activeBackend = 'none';
+      setButtonState(false);
+    });
+    widget.bind(window.SC.Widget.Events.FINISH, () => {
+      if (activeBackend !== 'soundcloud') return;
+      activeBackend = 'none';
+      setButtonState(false);
+    });
+  }
+
+  if (fallbackAudio) {
+    fallbackAudio.addEventListener('play', () => {
+      if (activeBackend !== 'fallback') return;
+      setButtonState(true);
+    });
+    fallbackAudio.addEventListener('pause', () => {
+      if (activeBackend !== 'fallback' || fallbackAudio.ended) return;
+      activeBackend = 'none';
+      setButtonState(false);
+    });
+    fallbackAudio.addEventListener('ended', () => {
+      if (activeBackend !== 'fallback') return;
+      activeBackend = 'none';
+      setButtonState(false);
+    });
+    fallbackAudio.addEventListener('error', () => {
+      if (activeBackend !== 'fallback') return;
+      console.warn('[music] Fallback audio encountered an error.');
+      activeBackend = 'none';
+      setButtonState(false);
+    });
+  }
+
+  configureAttribution();
+  initSoundCloudWidget();
+  setButtonState(false);
+
+  btn.addEventListener('click', async () => {
+    if (isPlaying) {
+      stopActivePlayback();
+      return;
+    }
+
+    const startedSoundCloud = playSoundCloud();
+    if (startedSoundCloud) return;
+    await playFallback();
   });
 }
 

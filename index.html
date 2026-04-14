@@ -155,10 +155,32 @@
   </section>
 
   <!-- Music Player -->
-  <audio id="bg-music" loop preload="auto">
+  <div class="music-embed-shell">
+    <iframe
+      id="sc-player"
+      title="SoundCloud music player"
+      src="about:blank"
+      loading="lazy"
+      allow="autoplay"
+      scrolling="no"
+      frameborder="no">
+    </iframe>
+  </div>
+  <p class="music-attribution">
+    Source:
+    <a id="music-source-link" href="https://soundcloud.com/nikhila-mohan/sets/krukavayal-kuruvi" target="_blank" rel="noopener">SoundCloud track</a>
+  </p>
+  <audio id="bg-music-fallback" loop preload="auto">
     <source src="assets/wedding-music.mp3" type="audio/mpeg">
   </audio>
-  <button class="music-toggle" id="music-toggle" aria-label="Toggle music">
+  <button
+    class="music-toggle"
+    id="music-toggle"
+    data-sc-track-url="https://soundcloud.com/nikhila-mohan/sets/krukavayal-kuruvi"
+    data-fallback-src="assets/wedding-music.mp3"
+    data-source-url="https://soundcloud.com/nikhila-mohan/sets/krukavayal-kuruvi"
+    aria-label="Play background music"
+    aria-pressed="false">
     <svg class="music-icon music-icon--on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M9 18V5l12-2v13"/>
       <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -170,6 +192,7 @@
     </svg>
   </button>
 
+  <script src="https://w.soundcloud.com/player/api.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

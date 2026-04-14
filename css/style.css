@@ -518,6 +518,57 @@ a {
   background: rgba(61, 61, 46, 1);
 }
 
+.music-embed-shell {
+  position: fixed;
+  bottom: 1.2rem;
+  right: 4.6rem;
+  z-index: 99;
+  width: min(220px, 58vw);
+  height: 42px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(198, 181, 128, 0.45);
+  background: rgba(61, 61, 46, 0.65);
+  opacity: 0.26;
+  transition: opacity 0.3s var(--ease-smooth);
+}
+
+.music-embed-shell:hover,
+.music-embed-shell:focus-within {
+  opacity: 0.72;
+}
+
+.music-embed-shell iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.music-attribution {
+  position: fixed;
+  right: 4.6rem;
+  bottom: 3.95rem;
+  z-index: 99;
+  max-width: min(220px, 58vw);
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+  color: rgba(225, 222, 219, 0.88);
+  text-align: right;
+  line-height: 1.25;
+}
+
+.music-attribution a {
+  color: var(--color-gold);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.music-attribution a:hover {
+  color: var(--color-gold-bright);
+}
+
 .music-toggle .music-icon--off {
   display: none;
 }
@@ -538,6 +589,19 @@ a {
 
 .music-toggle.is-playing {
   animation: pulse-ring 2s infinite;
+}
+
+@media (max-width: 480px) {
+  .music-embed-shell {
+    right: 4.3rem;
+    width: min(205px, 55vw);
+  }
+
+  .music-attribution {
+    right: 4.3rem;
+    bottom: 3.85rem;
+    max-width: min(205px, 55vw);
+  }
 }
 
 /* === Kalyanam Custom Overrides (stabilized) ===
