@@ -104,7 +104,35 @@ function initMusic() {
   const scTrackUrl = (btn.dataset.scTrackUrl || '').trim();
   const fallbackSrc = (btn.dataset.fallbackSrc || '').trim();
   const sourceUrl = (btn.dataset.sourceUrl || scTrackUrl).trim();
+  const scStartAtRaw = (btn.dataset.scStartAt || '').trim();
   const SOUND_CLOUD_CONFIRM_MS = 1800;
+
+  function parseStartOffsetSeconds(value) {
+    if (!value) return 0;
+
+    if (/^\d+(?:\.\d+)?$/.test(value)) {
+      const seconds = Math.floor(Number(value));
+      return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+    }
+
+    if (!/^\d{1,2}:\d{1,2}(?::\d{1,2})?$/.test(value)) return null;
+    const parts = value.split(':').map((part) => Number(part));
+    if (parts.some((part) => !Number.isFinite(part) || part < 0)) return null;
+
+    if (parts.length === 2) {
+      const [minutes, seconds] = parts;
+      return minutes * 60 + seconds;
+    }
+
+    const [hours, minutes, seconds] = parts;
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
+  const parsedStartOffsetSeconds = parseStartOffsetSeconds(scStartAtRaw);
+  if (scStartAtRaw && parsedStartOffsetSeconds === null) {
+    console.warn('[music] Invalid data-sc-start-at. Use seconds (e.g. "75") or mm:ss (e.g. "1:15").');
+  }
+  const scStartAtMs = parsedStartOffsetSeconds && parsedStartOffsetSeconds > 0 ? parsedStartOffsetSeconds * 1000 : 0;
 
   let widget = null;
   let widgetReady = false;
@@ -112,6 +140,7 @@ function initMusic() {
   let isPlaying = false;
   let awaitingSoundCloudPlay = false;
   let playConfirmTimeout = null;
+  let soundCloudStartApplied = false;
 
   function setButtonState(playing) {
     isPlaying = playing;
@@ -132,6 +161,16 @@ function initMusic() {
     try {
       widget.pause();
     } catch (_) {}
+  }
+
+  function applySoundCloudStartOffset() {
+    if (!widget || !widgetReady || !scStartAtMs || soundCloudStartApplied) return;
+    try {
+      widget.seekTo(scStartAtMs);
+      soundCloudStartApplied = true;
+    } catch (error) {
+      console.warn('[music] Failed to seek SoundCloud track to start offset.', error);
+    }
   }
 
   function stopActivePlayback() {
@@ -178,6 +217,7 @@ function initMusic() {
     clearPlayTimeout();
     awaitingSoundCloudPlay = true;
     activeBackend = 'soundcloud';
+    applySoundCloudStartOffset();
 
     try {
       widget.play();
@@ -242,11 +282,13 @@ function initMusic() {
     widget = window.SC.Widget(iframe);
     widget.bind(window.SC.Widget.Events.READY, () => {
       widgetReady = true;
+      applySoundCloudStartOffset();
     });
     widget.bind(window.SC.Widget.Events.PLAY, () => {
       clearPlayTimeout();
       awaitingSoundCloudPlay = false;
       activeBackend = 'soundcloud';
+      applySoundCloudStartOffset();
       setButtonState(true);
       if (fallbackAudio && !fallbackAudio.paused) {
         fallbackAudio.pause();
